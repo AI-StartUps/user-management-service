@@ -6,7 +6,7 @@ import (
 
 type UserService interface {
 	CreateUser(user domain.User) error
-	GetUsers() ([]domain.User, error)
+	GetUsers() ([]*domain.User, error)
 	GetUsersWithRole(roleName string) ([]*domain.User, error)
 	GetUserById(userId string) (*domain.User, error)
 	UpdateUser(user domain.User) error
@@ -28,7 +28,7 @@ type UserRoleService interface {
 type UserRepository interface {
 	CreateUser(user domain.User) error
 	GetUserById(userId string) (*domain.User, error)
-	GetUsers() ([]domain.User, error)
+	GetUsers() ([]*domain.User, error)
 	GetUsersWithRole(roleName string) ([]*domain.User, error)
 	UpdateUser(user domain.User) error
 	DeleteUser(userId string) error

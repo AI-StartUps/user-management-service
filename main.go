@@ -1,7 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"github.com/AI-StartUps/user-management-service/cmd"
+)
 
 func main() {
-	fmt.Println("User management service")
+	cmd.RunService()
 }

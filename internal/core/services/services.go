@@ -41,18 +41,18 @@ func NewUserRoleService(repo ports.UserRoleRepository) *userRoleService {
 	return &service
 }
 
-func (svc userService) CreateUser(user *domain.User) error {
+func (svc userService) CreateUser(user domain.User) error {
 	user.UserId = uuid.New().String()
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = time.Now()
-	return svc.repo.CreateUser(*user)
+	return svc.repo.CreateUser(user)
 }
 
 func (svc userService) GetUserById(userId string) (*domain.User, error) {
 	return svc.repo.GetUserById(userId)
 }
 
-func (svc userService) GetUsers() ([]domain.User, error) {
+func (svc userService) GetUsers() ([]*domain.User, error) {
 	return svc.repo.GetUsers()
 }
 func (svc userService) GetUsersWithRole(roleName string) ([]*domain.User, error) {
@@ -67,9 +67,9 @@ func (svc userService) DeleteUser(userId string) error {
 	return svc.repo.DeleteUser(userId)
 }
 
-func (svc roleService) CreateRole(role *domain.Role) error {
+func (svc roleService) CreateRole(role domain.Role) error {
 	role.RoleId = uuid.New().String()
-	return svc.repo.CreateRole(*role)
+	return svc.repo.CreateRole(role)
 }
 
 func (svc roleService) GetRoleById(roleId string) (*domain.Role, error) {
