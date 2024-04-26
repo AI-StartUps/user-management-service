@@ -1,8 +1,11 @@
 package services
 
 import (
+	"time"
+
 	"github.com/AI-StartUps/user-management-service/internal/core/domain"
 	"github.com/AI-StartUps/user-management-service/internal/core/ports"
+	"github.com/google/uuid"
 )
 
 type userService struct {
@@ -16,7 +19,6 @@ type roleService struct {
 type userRoleService struct {
 	repo ports.UserRoleRepository
 }
-
 
 func NewUserService(repo ports.UserRepository) *userService {
 	service := userService{
@@ -39,13 +41,22 @@ func NewUserRoleService(repo ports.UserRoleRepository) *userRoleService {
 	return &service
 }
 
-
 func (svc userService) CreateUser(user *domain.User) error {
+	user.UserId = uuid.New().String()
+	user.CreatedAt = time.Now()
+	user.UpdatedAt = time.Now()
 	return svc.repo.CreateUser(*user)
 }
 
 func (svc userService) GetUserById(userId string) (*domain.User, error) {
 	return svc.repo.GetUserById(userId)
+}
+
+func (svc userService) GetUsers() ([]domain.User, error) {
+	return svc.repo.GetUsers()
+}
+func (svc userService) GetUsersWithRole(roleName string) ([]*domain.User, error) {
+	return svc.repo.GetUsersWithRole(roleName)
 }
 
 func (svc userService) UpdateUser(user domain.User) error {
@@ -57,6 +68,7 @@ func (svc userService) DeleteUser(userId string) error {
 }
 
 func (svc roleService) CreateRole(role *domain.Role) error {
+	role.RoleId = uuid.New().String()
 	return svc.repo.CreateRole(*role)
 }
 
