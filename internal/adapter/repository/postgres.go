@@ -8,6 +8,7 @@ import (
 	"github.com/AI-StartUps/user-management-service/internal/core/domain"
 	"github.com/AI-StartUps/user-management-service/internal/core/ports"
 	_ "github.com/lib/pq"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type postgresClient struct {
@@ -169,11 +170,18 @@ func NewUserRolePostgresClient(config config.Config, logger ports.LoggerService)
 }
 
 func (svc postgresClient) CreateUser(user domain.User) error {
-	query := `
-        INSERT INTO users (user_id, username, password_hash, email, fullname, phone_number, avatar, address, created_at, updated_at)
+	password, err := bcrypt.GenerateFromPassword([]byte(user.PasswordHash), bcrypt.DefaultCost)
+	if err != nil {
+		svc.logger.Error(fmt.Sprintf(`Unable to hash password: %s`, err.Error()))
+		return  err
+	}
+	user.PasswordHash = string(password)
+
+	query := fmt.Sprintf(`
+        INSERT INTO %s (user_id, username, password_hash, email, fullname, phone_number, avatar, address, created_at, updated_at)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-    `
-	_, err := svc.db.Exec(query,
+    `, svc.tablename)
+	_, err = svc.db.Exec(query,
 		user.UserId,
 		user.Username,
 		user.PasswordHash,
@@ -193,11 +201,11 @@ func (svc postgresClient) CreateUser(user domain.User) error {
 }
 
 func (svc postgresClient) GetUserById(userId string) (*domain.User, error) {
-	query := `
+	query := fmt.Sprintf(`
         SELECT user_id, username, password_hash, email, fullname, phone_number, avatar, address, created_at, updated_at
-        FROM users
+        FROM %s
         WHERE user_id = $1
-    `
+    `, svc.tablename)
 	row := svc.db.QueryRow(query, userId)
 	user := &domain.User{}
 	err := row.Scan(&user.UserId, &user.Username, &user.PasswordHash, &user.Email, &user.FullName, &user.PhoneNumber, &user.Avatar, &user.Address, &user.CreatedAt, &user.UpdatedAt)
@@ -209,10 +217,10 @@ func (svc postgresClient) GetUserById(userId string) (*domain.User, error) {
 }
 
 func (svc postgresClient) GetUsers() ([]*domain.User, error) {
-	query := `
+	query := fmt.Sprintf(`
         SELECT user_id, username, password_hash, email, fullname, phone_number, avatar, address, created_at, updated_at
-        FROM users
-    `
+        FROM %s
+    `,svc.tablename)
 	rows, err := svc.db.Query(query)
 	if err != nil {
 		svc.logger.Error(fmt.Sprintf(`Unable to get users: %s`, err.Error()))
@@ -239,13 +247,13 @@ func (svc postgresClient) GetUsers() ([]*domain.User, error) {
 }
 
 func (svc postgresClient) GetUsersWithRole(roleName string) ([]*domain.User, error) {
-	query := `
+	query := fmt.Sprintf(`
         SELECT u.user_id, u.username, u.password_hash, u.email, u.fullname, u.phone_number, u.avatar, u.address, u.created_at, u.updated_at
-        FROM users u
+        FROM %s u
         JOIN user_roles ur ON u.user_id = ur.user_id
         JOIN roles r ON ur.role_id = r.role_id
         WHERE r.name = $1
-    `
+    `,svc.tablename)
 	rows, err := svc.db.Query(query, roleName)
 	if err != nil {
 		svc.logger.Error(fmt.Sprintf(`Unable to get users with role %s: %s`, roleName, err.Error()))
@@ -272,11 +280,11 @@ func (svc postgresClient) GetUsersWithRole(roleName string) ([]*domain.User, err
 }
 
 func (svc postgresClient) UpdateUser(user domain.User) error {
-	query := `
-        UPDATE users
+	query := fmt.Sprintf(`
+        UPDATE %s
         SET username=$2, password_hash=$3, email=$4, fullname=$5, phone_number=$6, avatar=$7, address=$8, updated_at=$9
         WHERE user_id=$1
-    `
+    `, svc.tablename)
 	_, err := svc.db.Exec(query, user.UserId, user.Username, user.PasswordHash, user.Email, user.FullName, user.PhoneNumber, user.Avatar, user.Address, user.UpdatedAt)
 	if err != nil {
 		svc.logger.Error(fmt.Sprintf(`Unable to update user: %s`, err.Error()))
@@ -286,10 +294,10 @@ func (svc postgresClient) UpdateUser(user domain.User) error {
 }
 
 func (svc postgresClient) DeleteUser(userId string) error {
-	query := `
-        DELETE FROM users
+	query := fmt.Sprintf(`
+        DELETE FROM %s
         WHERE user_id=$1
-    `
+    `, svc.tablename)
 	_, err := svc.db.Exec(query, userId)
 	if err != nil {
 		svc.logger.Error(fmt.Sprintf(`Unable to delete user: %s`, err.Error()))
@@ -299,10 +307,10 @@ func (svc postgresClient) DeleteUser(userId string) error {
 }
 
 func (svc postgresClient) CreateRole(role domain.Role) error {
-	query := `
-        INSERT INTO roles (role_id, name, description)
+	query := fmt.Sprintf(`
+        INSERT INTO %s (role_id, name, description)
         VALUES ($1, $2, $3)
-    `
+	`, svc.tablename)
 	_, err := svc.db.Exec(query, role.RoleId, role.Name, role.Description)
 	if err != nil {
 		svc.logger.Error(fmt.Sprintf(`Unable to create role: %s`, err.Error()))
@@ -312,11 +320,11 @@ func (svc postgresClient) CreateRole(role domain.Role) error {
 }
 
 func (svc postgresClient) GetRoleById(roleId string) (*domain.Role, error) {
-	query := `
+	query := fmt.Sprintf(`
         SELECT role_id, name, description
-        FROM roles
+        FROM %s
         WHERE role_id = $1
-    `
+	`, svc.tablename)
 	row := svc.db.QueryRow(query, roleId)
 	role := &domain.Role{}
 	err := row.Scan(&role.RoleId, &role.Name, &role.Description)
@@ -327,12 +335,42 @@ func (svc postgresClient) GetRoleById(roleId string) (*domain.Role, error) {
 	return role, nil
 }
 
+func (svc postgresClient) GetRoles() ([]*domain.Role, error) {
+	query := fmt.Sprintf(`
+        SELECT role_id, name, description
+        FROM %s
+    `,svc.tablename)
+	rows, err := svc.db.Query(query)
+	if err != nil {
+		svc.logger.Error(fmt.Sprintf(`Unable to get roles: %s`, err.Error()))
+		return nil, err
+	}
+	defer rows.Close()
+
+	roles := []*domain.Role{}
+	for rows.Next() {
+		role := &domain.Role{}
+		err := rows.Scan(&role.RoleId, &role.Name, &role.Description)
+		if err != nil {
+			svc.logger.Error(fmt.Sprintf(`Unable to get roles: %s`, err.Error()))
+			return nil, err
+		}
+		roles = append(roles, role)
+	}
+	if err := rows.Err(); err != nil {
+		svc.logger.Error(fmt.Sprintf(`Unable to get roles: %s`, err.Error()))
+		return nil, err
+	}
+
+	return roles, nil
+}
+
 func (svc postgresClient) UpdateRole(role domain.Role) error {
-	query := `
-        UPDATE roles
+	query := fmt.Sprintf(`
+        UPDATE %s
         SET name=$2, description=$3
         WHERE role_id=$1
-    `
+	`, svc.tablename)
 	_, err := svc.db.Exec(query, role.RoleId, role.Name, role.Description)
 	if err != nil {
 		svc.logger.Error(fmt.Sprintf(`Unable to update role: %s`, err.Error()))
@@ -342,10 +380,10 @@ func (svc postgresClient) UpdateRole(role domain.Role) error {
 }
 
 func (svc postgresClient) DeleteRole(roleId string) error {
-	query := `
-        DELETE FROM roles
+	query := fmt.Sprintf(`
+        DELETE FROM %s
         WHERE role_id=$1
-    `
+	`, svc.tablename)
 	_, err := svc.db.Exec(query, roleId)
 	if err != nil {
 		svc.logger.Error(fmt.Sprintf(`Unable to delete role: %s`, err.Error()))
@@ -355,10 +393,10 @@ func (svc postgresClient) DeleteRole(roleId string) error {
 }
 
 func (svc postgresClient) AddUserRole(userRole domain.UserRole) error {
-	query := `
-        INSERT INTO user_roles (user_id, role_id)
+	query := fmt.Sprintf(`
+        INSERT INTO %s (user_id, role_id)
         VALUES ($1, $2)
-    `
+   	`, svc.tablename)
 	_, err := svc.db.Exec(query, userRole.UserId, userRole.RoleId)
 	if err != nil {
 		svc.logger.Error(fmt.Sprintf(`Unable to add user role: %s`, err.Error()))
@@ -368,10 +406,10 @@ func (svc postgresClient) AddUserRole(userRole domain.UserRole) error {
 }
 
 func (svc postgresClient) RemoveUserRole(userRole domain.UserRole) error {
-	query := `
-        DELETE FROM user_roles
+	query := fmt.Sprintf(`
+        DELETE FROM %s
         WHERE user_id=$1 AND role_id=$2
-    `
+   	`, svc.tablename)
 	_, err := svc.db.Exec(query, userRole.UserId, userRole.RoleId)
 	if err != nil {
 		svc.logger.Error(fmt.Sprintf(`Unable to remove user role: %s`, err.Error()))

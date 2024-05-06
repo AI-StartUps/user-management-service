@@ -9,6 +9,8 @@ import (
 )
 
 type GinHandler interface {
+	Home(ctx *gin.Context)
+	Healthcheck(ctx *gin.Context)
 	CreateUser(ctx *gin.Context)
 	GetUsers(ctx *gin.Context)
 	GetUsersWithRole(ctx *gin.Context)
@@ -17,6 +19,7 @@ type GinHandler interface {
 	DeleteUser(ctx *gin.Context)
 	CreateRole(ctx *gin.Context)
 	GetRoleById(ctx *gin.Context)
+	GetRoles(ctx *gin.Context)
 	UpdateRole(ctx *gin.Context)
 	DeleteRole(ctx *gin.Context)
 	AddUserRole(ctx *gin.Context)
@@ -38,37 +41,74 @@ func NewGinHandler(userService ports.UserService, roleService ports.RoleService,
 	return routerHandler
 }
 
+func (h handler) Home(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, gin.H{
+		"responseMessage": "Usafi Hub",
+		"responseCode":    "200",
+	})
+}
+
+func (h handler) Healthcheck(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, gin.H{
+		"responseMessage": "Usafi Hub",
+		"responseCode":    "200",
+	})
+}
+
 func (h handler) CreateUser(ctx *gin.Context) {
 	var user domain.User
 	if err := ctx.ShouldBindJSON(&user); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"responseMessage": err.Error(),
+			"responseCode":    "400",
+		})
 		return
 	}
 
 	err := h.userService.CreateUser(user)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"responseMessage": err.Error(),
+			"responseCode":    "500",
+		})
 		return
 	}
 
-	ctx.Status(http.StatusCreated)
+	ctx.JSON(http.StatusCreated, gin.H{
+		"responseMessage": "User created successfully",
+		"responseCode":    "201",
+	})
 }
 
 func (h handler) GetUsers(ctx *gin.Context) {
 	users, err := h.userService.GetUsers()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"responseMessage": err.Error(),
+			"responseCode":    "500",
+		})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, users)
+	if len(users) == 0 {
+		ctx.JSON(http.StatusOK, gin.H{
+			"responseMessage": "No users found",
+			"responseCode":    "200",
+			"response":        users,
+		})
+	} else {
+		ctx.JSON(http.StatusOK, users)
+	}
 }
 
 func (h handler) GetUsersWithRole(ctx *gin.Context) {
 	roleName := ctx.Param("role_name")
 	users, err := h.userService.GetUsersWithRole(roleName)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"responseMessage": err.Error(),
+			"responseCode":    "500",
+		})
 		return
 	}
 
@@ -76,10 +116,13 @@ func (h handler) GetUsersWithRole(ctx *gin.Context) {
 }
 
 func (h handler) GetUserById(ctx *gin.Context) {
-	userId := ctx.Param("userId")
+	userId := ctx.Param("user_id")
 	user, err := h.userService.GetUserById(userId)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"responseMessage": err.Error(),
+			"responseCode":    "500",
+		})
 		return
 	}
 
@@ -89,116 +132,201 @@ func (h handler) GetUserById(ctx *gin.Context) {
 func (h handler) UpdateUser(ctx *gin.Context) {
 	var user domain.User
 	if err := ctx.ShouldBindJSON(&user); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"responseMessage": err.Error(),
+			"responseCode":    "400",
+		})
 		return
 	}
 
 	err := h.userService.UpdateUser(user)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"responseMessage": err.Error(),
+			"responseCode":    "500",
+		})
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, gin.H{
+		"responseMessage": "User updated successfully",
+		"responseCode":    "200",
+	})
 }
 
 func (h handler) DeleteUser(ctx *gin.Context) {
 	userId := ctx.Param("userId")
 	err := h.userService.DeleteUser(userId)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"responseMessage": err.Error(),
+			"responseCode":    "500",
+		})
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, gin.H{
+		"responseMessage": "User deleted successfully",
+		"responseCode":    "200",
+	})
 }
 
 func (h handler) CreateRole(ctx *gin.Context) {
 	var role domain.Role
 	if err := ctx.ShouldBindJSON(&role); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"responseMessage": err.Error(),
+			"responseCode":    "400",
+		})
 		return
 	}
 
 	if err := h.roleService.CreateRole(role); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"responseMessage": err.Error(),
+			"responseCode":    "500",
+		})
 		return
 	}
 
-	ctx.Status(http.StatusCreated)
+	ctx.JSON(http.StatusCreated, gin.H{
+		"responseMessage": "Role created successfully",
+		"responseCode":    "201",
+	})
 }
 
 func (h handler) GetRoleById(ctx *gin.Context) {
 	roleID := ctx.Param("roleId")
 	role, err := h.roleService.GetRoleById(roleID)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"responseMessage": err.Error(),
+			"responseCode":    "500",
+		})
 		return
 	}
 
 	if role == nil {
-		ctx.Status(http.StatusNotFound)
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"responseMessage": "Role not found",
+			"responseCode":    "404",
+		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, role)
 }
 
+func (h handler) GetRoles(ctx *gin.Context) {
+	roles, err := h.roleService.GetRoles()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"responseMessage": err.Error(),
+			"responseCode":    "500",
+		})
+		return
+	}
+	if len(roles) == 0 {
+		ctx.JSON(http.StatusOK, gin.H{
+			"responseMessage": "No roles found",
+			"responseCode":    "200",
+			"response":        roles,
+		})
+
+	} else {
+		ctx.JSON(http.StatusOK, roles)
+	}
+
+}
+
 func (h handler) UpdateRole(ctx *gin.Context) {
 	roleID := ctx.Param("roleId")
 	var role domain.Role
 	if err := ctx.ShouldBindJSON(&role); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"responseMessage": err.Error(),
+			"responseCode":    "400",
+		})
 		return
 	}
 
 	role.RoleId = roleID
 	if err := h.roleService.UpdateRole(role); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"responseMessage": err.Error(),
+			"responseCode":    "500",
+		})
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, gin.H{
+		"responseMessage": "Role updated successfully",
+		"responseCode":    "200",
+	})
 }
 
 func (h handler) DeleteRole(ctx *gin.Context) {
 	roleID := ctx.Param("roleId")
 	if err := h.roleService.DeleteRole(roleID); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"responseMessage": err.Error(),
+			"responseCode":    "500",
+		})
 		return
 	}
 
-	ctx.Status(http.StatusNoContent)
+	ctx.JSON(http.StatusOK, gin.H{
+		"responseMessage": "Role deleted successfully",
+		"responseCode":    "200",
+	})
 }
 
 func (h handler) AddUserRole(ctx *gin.Context) {
 	var userRole domain.UserRole
 	if err := ctx.ShouldBindJSON(&userRole); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"responseMessage": err.Error(),
+			"responseCode":    "400",
+		})
 		return
 	}
 
 	err := h.userRoleService.AddUserRole(userRole)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"responseMessage": err.Error(),
+			"responseCode":    "500",
+		})
 		return
 	}
 
-	ctx.Status(http.StatusCreated)
+	ctx.JSON(http.StatusCreated, gin.H{
+		"responseMessage": "User role created successfully",
+		"responseCode":    "201",
+	})
 }
 
 func (h handler) RemoveUserRole(ctx *gin.Context) {
 	var userRole domain.UserRole
 	if err := ctx.ShouldBindJSON(&userRole); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"responseMessage": err.Error(),
+			"responseCode":    "400",
+		})
 		return
 	}
 
 	err := h.userRoleService.RemoveUserRole(userRole)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"responseMessage": err.Error(),
+			"responseCode":    "500",
+		})
 		return
 	}
 
-	ctx.Status(http.StatusOK)
+	ctx.JSON(http.StatusOK, gin.H{
+		"responseMessage": "User role deleted successfully",
+		"responseCode":    "200",
+	})
 }

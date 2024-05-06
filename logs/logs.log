@@ -1,55 +1,9 @@
-2024/04/26 23:18:42 [2024-04-26 23:18:42][ERROR] open .env: no such file or directory
-2024/04/26 23:19:41 [2024-04-26 23:19:41][INFO] Connected to the database successfully
-2024/04/26 23:19:41 [2024-04-26 23:19:41][INFO] Connected to the database successfully
-2024/04/26 23:19:41 [2024-04-26 23:19:41][ERROR] Failed to create user_role table: pq: there is no unique constraint matching given keys for referenced table "dev_userroles"
-2024/04/26 23:26:58 [INFO] Connected to the database successfully
-2024/04/26 23:26:58 [INFO] Connected to the database successfully
-2024/04/26 23:26:58 [ERROR] Failed to create user_role table: pq: there is no unique constraint matching given keys for referenced table "dev_userroles"
-2024/04/26 23:28:34 [INFO] Connected to the database successfully
-2024/04/26 23:28:34 [INFO] Connected to the database successfully
-2024/04/26 23:28:34 [ERROR] Failed to create user_role table: pq: there is no unique constraint matching given keys for referenced table "dev_userroles"
-2024/04/26 23:30:16 [INFO] Connected to the database successfully
-2024/04/26 23:30:16 [INFO] Connected to the database successfully
-2024/04/26 23:30:16 [ERROR] Failed to add unique constraint to user_role table: pq: relation "unique_user_role" already exists
-2024/04/26 23:31:23 [INFO] Connected to the database successfully
-2024/04/26 23:31:23 [INFO] Connected to the database successfully
-2024/04/26 23:31:23 [ERROR] Failed to add unique constraint to user_role table: pq: relation "unique_user_role" already exists
-2024/04/26 23:33:52 [INFO] Connected to the database successfully
-2024/04/26 23:33:52 [INFO] Connected to the database successfully
-2024/04/26 23:33:52 [ERROR] Failed to add unique constraint to user_role table: pq: relation "unique_user_role" already exists
-2024/04/26 23:35:36 [INFO] Connected to the database successfully
-2024/04/26 23:35:36 [INFO] Connected to the database successfully
-2024/04/26 23:35:37 [ERROR] Failed to add unique constraint to user_role table: pq: relation "unique_user_role" already exists
-2024/04/26 23:37:02 [INFO] Connected to the database successfully
-2024/04/26 23:37:02 [INFO] Connected to the database successfully
-2024/04/26 23:37:02 [ERROR] Failed to create user_role table: pq: column "role_id" referenced in foreign key constraint does not exist
-2024/04/26 23:38:42 [INFO] Connected to the database successfully
-2024/04/26 23:38:42 [INFO] Connected to the database successfully
-2024/04/26 23:38:42 [ERROR] Failed to create user_role table: pq: column "user_id" referenced in foreign key constraint does not exist
-2024/04/26 23:40:57 [INFO] Connected to the database successfully
-2024/04/26 23:40:57 [INFO] Connected to the database successfully
-2024/04/26 23:40:58 [ERROR] Failed to create user_role table: pq: relation "roles" does not exist
-2024/04/26 23:41:16 [INFO] Connected to the database successfully
-2024/04/26 23:41:16 [INFO] Connected to the database successfully
-2024/04/26 23:41:16 [ERROR] Failed to create user_role table: pq: relation "roles" does not exist
-2024/04/26 23:41:52 [INFO] Connected to the database successfully
-2024/04/26 23:41:52 [INFO] Connected to the database successfully
-2024/04/26 23:41:52 [ERROR] Failed to create user_role table: pq: relation "roles" does not exist
-2024/04/26 23:43:18 [INFO] Connected to the database successfully
-2024/04/26 23:43:18 [INFO] Connected to the database successfully
-2024/04/26 23:43:19 [ERROR] Failed to create user_role table: pq: column "role_id" referenced in foreign key constraint does not exist
-2024/04/26 23:47:52 [INFO] Connected to the database successfully
-2024/04/26 23:47:52 [INFO] Connected to the database successfully
-2024/04/26 23:47:52 [ERROR] Failed to create user_role table: pq: relation "roles" does not exist
-2024/04/26 23:50:17 [INFO] Connected to the database successfully
-2024/04/26 23:50:17 [INFO] Connected to the database successfully
-2024/04/26 23:50:17 [INFO] Connected to the database successfully
-2024/04/26 23:51:45 [INFO] Connected to the database successfully
-2024/04/26 23:51:45 [INFO] Connected to the database successfully
-2024/04/26 23:51:45 [ERROR] Failed to add unique constraint to user_role table: pq: relation "unique_user_role" already exists
-2024/04/26 23:53:20 [INFO] Connected to the database successfully
-2024/04/26 23:53:20 [INFO] Connected to the database successfully
-2024/04/26 23:53:20 [ERROR] Failed to add unique constraint to user_role table: pq: relation "unique_user_role" already exists
-2024/04/26 23:55:51 [INFO] Connected to the database successfully
-2024/04/26 23:55:51 [INFO] Connected to the database successfully
-2024/04/26 23:55:51 [ERROR] Failed to add unique constraint to user_role table: pq: relation "unique_user_role" already exists
+2024/04/27 09:55:01 [INFO] Connected to the database successfully
+2024/04/27 09:55:01 [INFO] Connected to the database successfully
+2024/04/27 09:55:01 [ERROR] Failed to add unique constraint to user_role table: pq: relation "unique_user_role" already exists
+2024/04/27 10:02:19 [INFO] Connected to the database successfully
+2024/04/27 10:02:19 [INFO] Connected to the database successfully
+2024/04/27 10:02:19 [ERROR] Failed to add unique constraint to user_role table: pq: relation "unique_user_role" already exists
+2024/04/27 10:03:08 [INFO] Connected to the database successfully
+2024/04/27 10:03:08 [INFO] Connected to the database successfully
+2024/04/27 10:03:08 [ERROR] Failed to add unique constraint to user_role table: pq: relation "unique_user_role" already exists

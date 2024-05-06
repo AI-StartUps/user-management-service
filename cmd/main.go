@@ -9,7 +9,7 @@ import (
 )
 
 func RunService() {
-	logger, err := logger.NewDefaultLogger("./logs/logs.log")
+	logger, err := logger.NewDefaultLogger()
 	if err != nil {
 		panic(err)
 	}

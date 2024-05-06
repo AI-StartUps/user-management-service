@@ -16,6 +16,7 @@ type UserService interface {
 type RoleService interface {
 	CreateRole(role domain.Role) error
 	GetRoleById(roleId string) (*domain.Role, error)
+	GetRoles() ([]*domain.Role, error)
 	UpdateRole(role domain.Role) error
 	DeleteRole(roleId string) error
 }
@@ -37,6 +38,7 @@ type UserRepository interface {
 type RoleRepository interface {
 	CreateRole(role domain.Role) error
 	GetRoleById(roleId string) (*domain.Role, error)
+	GetRoles() ([]*domain.Role, error)
 	UpdateRole(role domain.Role) error
 	DeleteRole(roleId string) error
 }

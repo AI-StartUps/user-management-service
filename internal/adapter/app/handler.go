@@ -28,6 +28,11 @@ func InitGinRoutes(userService ports.UserService, roleService ports.RoleService,
 		userRoleService,
 	)
 
+	homeRoutes := router.Group("/")
+	{
+		homeRoutes.GET("/", handler.Home)
+		homeRoutes.GET("/health-check", handler.Healthcheck)
+	}
 	userRoutes := router.Group("/users/v1")
 	{
 		userRoutes.POST("/", handler.CreateUser)
@@ -41,6 +46,7 @@ func InitGinRoutes(userService ports.UserService, roleService ports.RoleService,
 	{
 		roleRoutes.POST("/", handler.CreateRole)
 		roleRoutes.GET("/:role_id", handler.GetRoleById)
+		roleRoutes.GET("/", handler.GetRoles)
 		roleRoutes.PUT(":role_id", handler.UpdateRole)
 		roleRoutes.DELETE("/:role_id", handler.DeleteRole)
 	}

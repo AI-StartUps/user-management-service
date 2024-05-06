@@ -37,7 +37,7 @@ func NewConfig(logger ports.LoggerService) (*Config, error) {
 
 	var (
 		SECRET_KEY        = os.Getenv("SECRET_KEY")
-		SERVER_PORT       = "5000"
+		SERVER_PORT       = "8082"
 		POSTGRES_DB       = "postgres"
 		POSTGRES_HOST     = "postgres"
 		POSTGRES_PORT     = "5432"
@@ -110,5 +110,6 @@ func NewConfig(logger ports.LoggerService) (*Config, error) {
 		DEBUG:             DEBUG,
 		TEST:              TEST,
 	}
+
 	return &config, nil
 }
