@@ -22,12 +22,10 @@ func RunService() {
 	roleRepo, _ := repository.NewRolePostgresClient(*config, logger)
 	userRepo, _ := repository.NewUserPostgresClient(*config, logger)
 	userRoleRepo, _ := repository.NewUserRolePostgresClient(*config, logger)
-	
 
 	userService := services.NewUserService(userRepo)
 	roleService := services.NewRoleService(roleRepo)
 	userRoleService := services.NewUserRoleService(userRoleRepo)
 
-	// Run HTTP Server
 	app.InitGinRoutes(userService, roleService, userRoleService, *config)
 }

@@ -35,12 +35,11 @@ func TestRoleDomain(t *testing.T) {
 			Description: "Admininstrator role",
 		}
 
-		if role.Name != "1" {
+		if role.Name != "Admin" {
 			t.Errorf("expected Name to be 'Admin', got %s", role.Name)
 		}
 	})
 }
-
 
 func TestUserRoleDomain(t *testing.T) {
 	// Test UserRole creation

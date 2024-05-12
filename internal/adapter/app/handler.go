@@ -54,7 +54,7 @@ func InitGinRoutes(userService ports.UserService, roleService ports.RoleService,
 	userRoleRoutes := router.Group("/user_roles/v1")
 	{
 		userRoleRoutes.POST("/", handler.AddUserRole)
-		userRoleRoutes.GET("/:role_id", handler.RemoveUserRole)
+		userRoleRoutes.GET("/:user_role_id", handler.RemoveUserRole)
 	}
 	log.Printf("Server running on port 0.0.0.0:%s", config.SERVER_PORT)
 	router.Run(fmt.Sprintf(":%s", config.SERVER_PORT))

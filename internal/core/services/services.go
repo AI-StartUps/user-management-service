@@ -6,8 +6,11 @@ import (
 	"github.com/AI-StartUps/user-management-service/internal/core/domain"
 	"github.com/AI-StartUps/user-management-service/internal/core/ports"
 	"github.com/google/uuid"
-
 )
+
+type BaseService struct {
+	repo ports.BaseRepository
+}
 
 type UserService struct {
 	repo ports.UserRepository
@@ -19,6 +22,13 @@ type RoleService struct {
 
 type UserRoleService struct {
 	repo ports.UserRoleRepository
+}
+
+func NewBaseService(repo ports.BaseRepository) *BaseService {
+	service := BaseService{
+		repo: repo,
+	}
+	return &service
 }
 
 func NewUserService(repo ports.UserRepository) *UserService {
@@ -42,11 +52,11 @@ func NewUserRoleService(repo ports.UserRoleRepository) *UserRoleService {
 	return &service
 }
 
-func (svc UserService) CreateUser(user domain.User) error {
+func (svc UserService) CreateUser(user domain.User) (*domain.User, error) {
 	user.UserId = uuid.New().String()
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = time.Now()
-	
+
 	if user.PasswordHash == "" {
 		user.PasswordHash = "admin"
 	}
@@ -65,7 +75,7 @@ func (svc UserService) GetUsersWithRole(roleName string) ([]*domain.User, error)
 	return svc.repo.GetUsersWithRole(roleName)
 }
 
-func (svc UserService) UpdateUser(user domain.User) error {
+func (svc UserService) UpdateUser(user domain.User) (*domain.User, error) {
 	user.UpdatedAt = time.Now()
 	return svc.repo.UpdateUser(user)
 }
@@ -74,7 +84,7 @@ func (svc UserService) DeleteUser(userId string) error {
 	return svc.repo.DeleteUser(userId)
 }
 
-func (svc RoleService) CreateRole(role domain.Role) error {
+func (svc RoleService) CreateRole(role domain.Role) (*domain.Role, error) {
 	role.RoleId = uuid.New().String()
 	return svc.repo.CreateRole(role)
 }
@@ -101,4 +111,8 @@ func (svc UserRoleService) AddUserRole(userRole domain.UserRole) error {
 
 func (svc UserRoleService) RemoveUserRole(userRole domain.UserRole) error {
 	return svc.repo.RemoveUserRole(userRole)
+}
+
+func (svc BaseService) DropTables() error {
+	return svc.repo.DropTables()
 }

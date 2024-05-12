@@ -33,19 +33,20 @@ func NewConfig(logger ports.LoggerService) (*Config, error) {
 			logger.Error(err.Error())
 			return nil, err
 		}
+
 	}
 
 	var (
 		SECRET_KEY        = os.Getenv("SECRET_KEY")
 		SERVER_PORT       = "8082"
-		POSTGRES_DB       = "postgres"
+		POSTGRES_DB       = "usafihub"
 		POSTGRES_HOST     = "postgres"
 		POSTGRES_PORT     = "5432"
 		POSTGRES_USER     = "postgres"
 		POSTGRES_PASSWORD = os.Getenv("POSTGRES_PASSWORD")
-		USER_TABLE        = "Users"
-		ROLE_TABLE        = "Roles"
-		USER_ROLE_TABLE   = "UserRoles"
+		USER_TABLE        = ""
+		ROLE_TABLE        = ""
+		USER_ROLE_TABLE   = ""
 		DEBUG             = false
 		TEST              = false
 	)
@@ -76,9 +77,9 @@ func NewConfig(logger ports.LoggerService) (*Config, error) {
 		SECRET_KEY = "testsecret"
 		POSTGRES_PASSWORD = "pass1234"
 		POSTGRES_HOST = "localhost"
-		USER_TABLE = "Test_Test_Users"
-		ROLE_TABLE = "Test_Test_Roles"
-		USER_ROLE_TABLE = "Test_Test_UserRoles"
+		USER_TABLE = "Test_Users"
+		ROLE_TABLE = "Test_Roles"
+		USER_ROLE_TABLE = "Test_UserRoles"
 
 	case "docker":
 		TEST = true
