@@ -309,7 +309,7 @@ func (svc postgresClient) GetUsersWithRole(roleName string) ([]*domain.User, err
         JOIN %s r ON ur.role_id = r.role_id
         WHERE r.name = $1
     `, svc.usersTablename, svc.rolesUsersTablename, svc.rolesTablename)
-	rows, err := svc.db.Query(query, roleName, svc.DropTables())
+	rows, err := svc.db.Query(query, roleName)
 	if err != nil {
 		svc.logger.Error(fmt.Sprintf(`Unable to get users with role %s: %s`, roleName, err.Error()))
 		return nil, err
